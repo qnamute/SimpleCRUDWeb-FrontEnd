@@ -1,0 +1,22 @@
+<ng-container *ngIf="(blogPost$ | async) as blogPost; else loading">
+
+  <mat-card class="example-card">
+    <mat-card-header>
+      <div mat-card-avatar class="example-header-image"></div>
+      <mat-card-title>Title: {{ blogPost.title }}</mat-card-title>
+      <mat-card-subtitle>Creator: {{ blogPost.creator }}</mat-card-subtitle>
+      <mat-card-subtitle>Date Created: {{ blogPost.dt | date}}</mat-card-subtitle>
+
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        {{ blogPost.body }}
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" [routerLink]="['/']" routerLinkActive="router-link-active" >Back</button>
+    </mat-card-actions>
+  </mat-card>
+
+</ng-container>
+<ng-template #loading>Loading…</ng-template>
