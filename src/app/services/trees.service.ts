@@ -72,7 +72,6 @@ export class TreesService {
   }
 
   updateItem(node: FoodNode, name: string) {
-    let tree = Map<
     return this.http.put<Tree>(this.myAppUrl + this.myApiUrl + node.treeId, JSON.stringify(node), this.httpOptions)
     .pipe(
       retry(1),

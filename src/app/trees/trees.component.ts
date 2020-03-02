@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, VirtualTimeScheduler } from 'rxjs';
-import { CollectionViewer, SelectionChange } from '@angular/cdk/collections';
+import { Observable, VirtualTimeScheduler, BehaviorSubject } from 'rxjs';
 import { TreesService } from '../services/trees.service';
-import { Tree } from '../models/tree';
+import { ListdatabaseService } from '../services/listdatabase.service';
 
 import { FlatNode } from '../interfaces/FlatNode';
 import { FoodNode } from '../interfaces/FoodNode';
@@ -15,19 +14,65 @@ import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree'
   templateUrl: './trees.component.html',
   styleUrls: ['./trees.component.css']
 })
-export class TreesComponent implements OnInit {
+export class TreesComponent {
 
-  flatNodeMap = new Map<FlatNode, FoodNode>();
+  dataChange: BehaviorSubject<FoodNode[]> = new BehaviorSubject<FoodNode[]>([]);
 
-  nestedNodeMap = new Map<FoodNode, FlatNode>();
+  flatNodeMap: Map<FlatNode, FoodNode> = new Map<FlatNode, FoodNode>();
+
+  nestedNodeMap: Map<FoodNode, FlatNode> = new Map<FoodNode, FlatNode>();
 
   selectedParent: FlatNode | null = null;
 
   newItemName = '';
 
-  treeControl = new FlatTreeControl<FlatNode>(
-    node => node.level, node => node.expandable);
+  treeControl = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable);
 
+  treeFlattener: MatTreeFlattener<FoodNode, FlatNode>;
+
+  dataSource: MatTreeFlatDataSource<FoodNode, FlatNode>;
+
+  constructor(private treesService: TreesService, private databaseService: ListdatabaseService) {
+
+    this.treeFlattener = new MatTreeFlattener(
+      this.transformer,
+      this.getLevel,
+      this.isExpandable,
+      this.getChildren
+    );
+
+    this.treeControl = new FlatTreeControl<FlatNode>(
+      this.getLevel,
+      this.isExpandable
+    );
+
+    this.dataSource = new MatTreeFlatDataSource(
+      this.treeControl,
+      this.treeFlattener
+    );
+
+    this.treesService.getTreesStructure().subscribe(value => {
+      this.dataSource.data = value;
+    });
+
+    databaseService.dataChange.subscribe(data => {
+      this.dataSource.data = data;
+    });
+  }
+
+
+
+  getLevel = (node: FlatNode) => node.level;
+
+  isExpandable = (node: FlatNode) => node.expandable;
+
+  getChildren = (node: FoodNode): FoodNode[] => node.children;
+
+  hasChild = (_: number, node: FlatNode) => node.expandable;
+
+  hasNoContent = (_: number, nodeData: FlatNode) => nodeData.name === '';
+
+  // Transformer to convert nested node to flat node. Record the nodes in maps for later use.
   transformer = (node: FoodNode, lv: number) => {
     const existingNode = this.nestedNodeMap.get(node);
     const flatNode = existingNode && existingNode.name === node.name
@@ -45,42 +90,27 @@ export class TreesComponent implements OnInit {
     return flatNode;
   }
 
-  treeFlattener = new MatTreeFlattener(
-    this.transformer, node => node.level, node => node.expandable, node => node.children);
-
-  dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-
-  constructor(private treesService: TreesService) {
-    this.treesService.getTreesStructure().subscribe(value => {
-      this.dataSource.data = value;
-    });
-  }
-  hasChild = (_: number, node: FlatNode) => node.expandable;
-
-  hasNoContent = (_: number, nodeData: FlatNode) => nodeData.name === '';
-
-  ngOnInit(): void {
-  }
-
-  isExpandable(treeId) {
-    this.treesService.getTree(treeId).subscribe(value => {
-      if (value.hasChild === true) {
-        return true;
-      }
-      return false;
-    });
-  }
   // Add new children
-  addNewNode(node: FlatNode) {
+  addNewItem(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
-    // this.treesService.insertNode(parentNode!, '');
-    console.log(this.hasNoContent);
-    this.treeControl.expand(node);
+
+    let isParentHasChildren = false;
+    if (parentNode.children) {
+      isParentHasChildren = true;
+    }
+    this.databaseService.insertItem(parentNode, '');
+    if (isParentHasChildren) {
+      this.treeControl.expand(node);
+    }
   }
 
   // Save node
   saveNode(node: FlatNode, itemValue: string) {
     const nestedNode = this.flatNodeMap.get(node);
     // this.treesService.update Tree(nestedNode!, itemValue);
+  }
+
+  get data(): FoodNode[] {
+    return this.dataChange.value;
   }
 }
