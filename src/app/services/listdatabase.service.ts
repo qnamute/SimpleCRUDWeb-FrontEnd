@@ -61,7 +61,8 @@ export class ListdatabaseService {
     } else {
       // if parent is a leaf node
       parent.children = [];
-      parent.children.push(child);
+      parent.children.push(child); 
+      // asdasdas
       this.dataChange.next(this.data);
     }
   }
