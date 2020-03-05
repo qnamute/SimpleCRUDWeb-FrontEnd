@@ -1,41 +1,21 @@
 <h3>Action</h3>
-<div class="example-button-row">
-    <mat-form-field class="example-full-width">
-        <mat-label>Favorite food</mat-label>
-        <input matInput placeholder="Ex. Pizza" value="Sushi">
+<div class="example-button-row" *ngIf="selectedNode">
+    <mat-form-field>
+        <mat-label>Edit item: {{selectedNode.name}}</mat-label>
+        <input matInput #itemEditValue value="{{selectedNode.name}}">
     </mat-form-field>
-    <button mat-raised-button color="accent">Add new root</button>
-    <button mat-raised-button color="warn">Delete selected</button>
+    <button mat-button (click)="editItem(selectedNode, itemEditValue.value)" color="primary">Save <mat-icon>save
+        </mat-icon></button>
 </div>
-
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
-        <button mat-icon-button disabled></button>
-        {{node.name}}
-        <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
-            (click)="addNewItem(node)" title="Add new children">
-            <mat-icon>add_circle_outline</mat-icon>
-        </button>
-        <button mat-icon-button color="accent" aria-label="Example icon-button with a heart icon"
-            title="Edit this node">
-            <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node">
-            <mat-icon>delete</mat-icon>
-        </button>
-    </mat-tree-node>
-
-    <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
-        <button mat-icon-button disabled></button>
-        <mat-form-field>
-            <mat-label>New item...</mat-label>
-            <input matInput #itemValue placeholder="Ex. Lettuce">
-        </mat-form-field>
-        <button mat-button>Save</button>
-    </mat-tree-node>
-
-    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
-        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
+<div class="row-btn">
+    <button mat-raised-button color="accent" (click)="addnewRootItem()">Add new root</button>
+</div>
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="trees">
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding (click)="onSelect(node)" class="tree"
+        [class.selected]="node === selectedNode">
+        <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
+        <button mat-icon-button *ngIf="isExpandable(node)" matTreeNodeToggle
+            [attr.aria-label]="'toggle ' + node.filename">
             <mat-icon class="mat-icon-rtl-mirror">
                 {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
@@ -45,11 +25,37 @@
             (click)="addNewItem(node)" title="Add new children">
             <mat-icon>add_circle_outline</mat-icon>
         </button>
-        <button mat-icon-button color="accent" aria-label="Example icon-button with a heart icon"
-            title="Edit this node">
-            <mat-icon>edit</mat-icon>
+        <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
+            (click)="deleteItem(node)">
+            <mat-icon>delete</mat-icon>
         </button>
-        <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node">
+    </mat-tree-node>
+    <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
+        <button mat-icon-button disabled></button>
+        <mat-form-field>
+            <mat-label>New item...</mat-label>
+            <input matInput #itemValue>
+        </mat-form-field>
+        <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
+        <button mat-button (click)="cancelNode(node)">Cancel</button>
+    </mat-tree-node>
+
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding (click)="onSelect(node)" class="tree"
+        [class.selected]="node === selectedNode">
+        <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
+        <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
+            [attr.aria-label]="'toggle ' + node.filename">
+            <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+        </button>
+        {{node.name}}
+        <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
+            (click)="addNewItem(node)" title="Add new children">
+            <mat-icon>add_circle_outline</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
+            (click)="deleteItem(node)">
             <mat-icon>delete</mat-icon>
         </button>
     </mat-tree-node>

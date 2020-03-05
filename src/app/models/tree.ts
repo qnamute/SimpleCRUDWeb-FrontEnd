@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 export class Tree {
-    treeId: number;
+    treeId?: number;
     name: string;
     parentId: number;
     hasChild: boolean;

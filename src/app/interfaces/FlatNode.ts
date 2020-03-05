@@ -3,4 +3,5 @@ export class FlatNode {
     expandable: boolean;
     name: string;
     level: number;
+    parentId: number;
 };

@@ -50,20 +50,14 @@ export class TreesService {
   }
 
   saveTree(tree): Observable<Tree> {
-    return this.http.post<Tree>(this.myAppUrl + this.myApiUrl, JSON.stringify(tree), this.httpOptions)
+    return this.http.post<Tree>('https://localhost:44369/api/trees', JSON.stringify(tree), this.httpOptions)
       .pipe(
         retry(1),
         catchError(this.errorHandler)
       );
   }
 
-  // insertNode(parent: FoodNode, name: string) {
-  //   if(parent.children) {
-  //     parent.children.push
-  //   }
-  // }
-
-  updateTree(treeId: number, tree): Observable<Tree> {
+  updateTree(treeId: number, tree: Tree): Observable<Tree> {
     return this.http.put<Tree>(this.myAppUrl + this.myApiUrl + treeId, JSON.stringify(tree), this.httpOptions)
       .pipe(
         retry(1),

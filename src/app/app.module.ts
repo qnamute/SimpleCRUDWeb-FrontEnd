@@ -25,7 +25,8 @@ import { MatCardModule } from '@angular/material/card';
 import { TreesComponent } from './trees/trees.component';
 import { MatTreeModule } from '@angular/material/tree';
 import { TreesService } from './services/trees.service';
-
+import { ListdatabaseService } from './services/listdatabase.service';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -53,11 +54,13 @@ import { TreesService } from './services/trees.service';
     MatTableModule,
     MatIconModule,
     MatCardModule,
-    MatTreeModule
+    MatTreeModule,
+    FormsModule
   ],
   providers: [
     BlogPostService,
-    TreesService
+    TreesService,
+    ListdatabaseService,
   ],
   bootstrap: [AppComponent]
 })

@@ -6,3 +6,21 @@
 .example-button-row a {
     margin-right: 8px;
 }
+
+.trees .tree:hover {
+    color: #607D8B;
+    background-color: #DDD;
+    left: .1em;
+  }
+  .trees .tree.selected {
+    background-color: #CFD8DC;
+    color: white;
+  }
+  .trees .tree.selected:hover {
+    background-color: #BBD8DC;
+    color: white;
+  }
+
+  .row-btn {
+      margin-bottom: 20px;
+  }

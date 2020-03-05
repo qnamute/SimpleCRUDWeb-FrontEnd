@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, VirtualTimeScheduler, BehaviorSubject } from 'rxjs';
+import { Observable, VirtualTimeScheduler, BehaviorSubject, from } from 'rxjs';
 import { TreesService } from '../services/trees.service';
 import { ListdatabaseService } from '../services/listdatabase.service';
 
 import { FlatNode } from '../interfaces/FlatNode';
 import { FoodNode } from '../interfaces/FoodNode';
+import { Tree } from '../models/tree';
 
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
@@ -25,6 +26,12 @@ export class TreesComponent {
   selectedParent: FlatNode | null = null;
 
   newItemName = '';
+
+  isEditing = true;
+
+  newItemId: number;
+
+  selectedNode: FlatNode;
 
   treeControl = new FlatTreeControl<FlatNode>(node => node.level, node => node.expandable);
 
@@ -51,16 +58,10 @@ export class TreesComponent {
       this.treeFlattener
     );
 
-    this.treesService.getTreesStructure().subscribe(value => {
-      this.dataSource.data = value;
-    });
-
     databaseService.dataChange.subscribe(data => {
       this.dataSource.data = data;
     });
   }
-
-
 
   getLevel = (node: FlatNode) => node.level;
 
@@ -79,9 +80,15 @@ export class TreesComponent {
       ? existingNode
       : new FlatNode();
     flatNode.name = node.name;
+    flatNode.treeId = node.treeId;
+    flatNode.parentId = node.parentId;
     flatNode.level = lv;
-    if (node.children.length > 0) {
-      flatNode.expandable = true;
+    if (node.children) {
+      if (node.children.length > 0) {
+        flatNode.expandable = true;
+      } else {
+        flatNode.expandable = false;
+      }
     } else {
       flatNode.expandable = false;
     }
@@ -93,7 +100,6 @@ export class TreesComponent {
   // Add new children
   addNewItem(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
-
     let isParentHasChildren = false;
     if (parentNode.children) {
       isParentHasChildren = true;
@@ -104,13 +110,40 @@ export class TreesComponent {
     }
   }
 
+  editItem(node: FlatNode, itemEditValue: string) {
+    const nestedNode = this.flatNodeMap.get(node);
+    this.databaseService.updateItem(nestedNode, itemEditValue);
+  }
+
+  deleteItem(node: FlatNode) {
+    const parentNode = this.flatNodeMap.get(node);
+    let isParentHasChildren = false;
+    if (parentNode.children) {
+      isParentHasChildren = true;
+    }
+    const ans = confirm('Do you want to delete tree with id: ' + node.treeId + ', name: ' + node.name);
+    if (ans) {
+      this.databaseService.deleteItem(node.treeId, parentNode);
+    }
+  }
+
+  // Add new root item
+
+  addnewRootItem() {
+    
+  }
+
   // Save node
   saveNode(node: FlatNode, itemValue: string) {
     const nestedNode = this.flatNodeMap.get(node);
-    // this.treesService.update Tree(nestedNode!, itemValue);
+    this.databaseService.updateItem(nestedNode, itemValue);
   }
 
-  get data(): FoodNode[] {
-    return this.dataChange.value;
+  cancelNode(node: FlatNode) {
+    // Throw 
+  }
+
+  onSelect(node: FlatNode) {
+    this.selectedNode = node;
   }
 }
