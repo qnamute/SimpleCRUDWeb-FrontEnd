@@ -67,10 +67,10 @@ export class TreesService {
 
   updateItem(node: FoodNode, name: string) {
     return this.http.put<Tree>(this.myAppUrl + this.myApiUrl + node.treeId, JSON.stringify(node), this.httpOptions)
-    .pipe(
-      retry(1),
-      catchError(this.errorHandler)
-    );
+      .pipe(
+        retry(1),
+        catchError(this.errorHandler)
+      );
   }
 
   deleteTree(treeId: number): Observable<Tree> {

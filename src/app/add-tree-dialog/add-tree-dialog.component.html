@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Add new node</h1>
+<div mat-dialog-content>
+    <mat-form-field>
+        <mat-label>Node name</mat-label>
+        <input matInput>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Node Continent</mat-label>
+        <mat-select>
+            <mat-option *ngFor="let continent of continents" [value]="continent.id">
+                {{continent.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">No Thanks</button>
+    <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
+</div>

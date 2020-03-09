@@ -1,8 +1,10 @@
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { Continent } from '../models/continent';
 
 export class Tree {
-    treeId?: number;
-    name: string;
-    parentId: number;
-    hasChild: boolean;
-  }
+  treeId?: number;
+  name: string;
+  continent?: Continent[];
+  parentId: number;
+  hasChild: boolean;
+}

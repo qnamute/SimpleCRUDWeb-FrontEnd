@@ -27,6 +27,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { TreesService } from './services/trees.service';
 import { ListdatabaseService } from './services/listdatabase.service';
 import { FormsModule } from '@angular/forms';
+import { AddTreeDialogComponent } from './add-tree-dialog/add-tree-dialog.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { FormsModule } from '@angular/forms';
     BlogPostsComponent,
     BlogPostComponent,
     BlogPostAddEditComponent,
-    TreesComponent
+    TreesComponent,
+    AddTreeDialogComponent
   ],
   imports: [
     BrowserModule,

@@ -140,7 +140,8 @@ export class TreesComponent {
   }
 
   cancelNode(node: FlatNode) {
-    // Throw 
+    const parentNode = this.flatNodeMap.get(node);
+    this.databaseService.cancleInsertItem(parentNode);
   }
 
   onSelect(node: FlatNode) {

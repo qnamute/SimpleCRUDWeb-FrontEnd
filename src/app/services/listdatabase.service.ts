@@ -3,13 +3,16 @@ import { BehaviorSubject } from 'rxjs';
 import { FoodNode } from '../interfaces/FoodNode';
 import { TreesService } from '../services/trees.service';
 import { Tree } from '../models/tree';
-import { removeSummaryDuplicates } from '@angular/compiler';
+import { removeSummaryDuplicates, unescapeIdentifier } from '@angular/compiler';
+import { FlatNode } from '../interfaces/FlatNode';
 @Injectable({
   providedIn: 'root'
 })
 export class ListdatabaseService {
 
   dataChange: BehaviorSubject<FoodNode[]> = new BehaviorSubject<FoodNode[]>([]);
+
+  parentNode: FoodNode;
 
   get data(): FoodNode[] {
     return this.dataChange.value;
@@ -70,29 +73,34 @@ export class ListdatabaseService {
       this.data.forEach(value => {
         this.removeNodeInData(value.children, treeId);
       });
-      this.removeNodeInData(this.data, treeId);
       console.log(this.data);
       this.dataChange.next(this.data);
     });
   }
 
   removeNodeInData(nodes: FoodNode[], treeId: number) {
-    nodes.forEach(value => {
-      if (value.treeId === treeId) {
-        nodes = nodes.filter(n => n.treeId !== treeId);
+    for (const index in nodes) {
+      if (nodes[index].treeId === treeId) {
+        nodes.splice(Number(index), 1);
         return;
       } else {
-        if (value.children.length > 0) {
-          this.removeNodeInData(value.children, treeId);
+        if (nodes[index].children.length > 0) {
+          this.removeNodeInData(nodes[index].children, treeId);
+          continue;
         }
       }
-    });
+    }
+    this.dataChange.next(this.data);
   }
 
   insertItem(parent: FoodNode, nameNode: string) {
+
+    this.parentNode = parent;
+
     const child = new FoodNode();
     child.name = nameNode;
     child.parentId = parent.treeId;
+    child.children = [];
     if (parent.children) {
       // parent already has children
       parent.children.push(child);
@@ -101,6 +109,11 @@ export class ListdatabaseService {
       parent.children = [];
       parent.children.push(child);
     }
+    this.dataChange.next(this.data);
+  }
+
+  cancleInsertItem(node: FoodNode) {
+    this.parentNode.children.pop();
     this.dataChange.next(this.data);
   }
 
@@ -120,7 +133,7 @@ export class ListdatabaseService {
       const tree: Tree = {
         name: node.name,
         parentId: node.parentId,
-        hasChild: false
+        hasChild: false,
       };
       this.treeService.saveTree(tree).subscribe(value => {
         node.treeId = value.treeId;
@@ -128,9 +141,5 @@ export class ListdatabaseService {
         // result = value;
       });
     }
-  }
-
-  removeSubObject(node: FoodNode) {
-
   }
 }
