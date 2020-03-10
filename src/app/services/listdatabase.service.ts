@@ -92,14 +92,8 @@ export class ListdatabaseService {
     this.dataChange.next(this.data);
   }
 
-  insertItem(parent: FoodNode, nameNode: string) {
-
+  insertItem(parent: FoodNode, child: FoodNode) {
     this.parentNode = parent;
-
-    const child = new FoodNode();
-    child.name = nameNode;
-    child.parentId = parent.treeId;
-    child.children = [];
     if (parent.children) {
       // parent already has children
       parent.children.push(child);
@@ -118,25 +112,27 @@ export class ListdatabaseService {
 
   updateItem(node: FoodNode) {
     if (node.treeId) {
+      // Edit node
       const tree: Tree = {
         treeId: node.treeId,
         name: node.name,
-        parentId: node.parentId,
-        hasChild: false
+        hasChild: false,
+        continentId: node.continent.continentId,
       };
-      this.treeService.updateTree(node.treeId, tree).subscribe(value => {
-        this.dataChange.next(this.data);
-      });
+      console.log(tree);
+      // this.treeService.updateTree(node.treeId, tree).subscribe(value => {
+
+      // });
     } else {
+      // Add new node
       const tree: Tree = {
         name: node.name,
         parentId: node.parentId,
         hasChild: false,
+        continentId: node.continent.continentId
       };
       this.treeService.saveTree(tree).subscribe(value => {
-        node.treeId = value.treeId;
-        this.dataChange.next(this.data);
-        // result = value;
+
       });
     }
   }

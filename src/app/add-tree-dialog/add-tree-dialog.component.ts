@@ -17,7 +17,7 @@ export class AddTreeDialogComponent implements OnInit {
   form: FormGroup;
   flatNode: FlatNode;
   action: string;
-  selected: number;
+  selected: Continent;
 
   constructor(public dialogRef: MatDialogRef<AddTreeDialogComponent>, private continentService: ContinentService,
     // tslint:disable-next-line: align
@@ -25,13 +25,15 @@ export class AddTreeDialogComponent implements OnInit {
     this.flatNode = dialogData.flatNode;
     this.form = dialogData.form;
     this.action = dialogData.action;
+    this.selected = this.dialogData.flatNode.continent;
+    this.buildForm();
   }
 
   ngOnInit(): void {
     this.continentService.getContinents().subscribe(data => {
       this.continents = data;
     });
-    this.buildForm();
+    // this.buildForm();
   }
 
   buildForm(): void {
@@ -39,31 +41,26 @@ export class AddTreeDialogComponent implements OnInit {
       this.form = new FormGroup({
         treeId: new FormControl(undefined),
         name: new FormControl('', Validators.required),
-        continentId: new FormControl('', Validators.required),
+        continent: new FormControl('', Validators.required),
         parentId: new FormControl(this.flatNode.treeId, Validators.required),
       });
     } else if (this.action === 'Edit') {
-      this.selected = this.flatNode.continent.continentId;
       this.form = new FormGroup({
         treeId: new FormControl(this.flatNode.treeId),
         name: new FormControl(this.flatNode.name, Validators.required),
-        continentId: new FormControl(this.flatNode.continent.continentId, Validators.required),
-        continentName: new FormControl(this.flatNode.continent.name)
+        continent: new FormControl(this.flatNode.continent, Validators.required),
       });
-      console.log(this.flatNode);
     }
   }
 
   onCancelClick(): void {
     this.dialogRef.close();
-    console.log('Dialog is closed');
   }
 
   onSaveClick(): void {
     if (this.form.invalid) {
       return;
     }
-
     this.dialogRef.close(this.form.value);
   }
 }

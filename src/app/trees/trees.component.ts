@@ -118,36 +118,6 @@ export class TreesComponent implements OnInit {
     return flatNode;
   }
 
-  // Add new children
-  // addNewItem(node: FlatNode) {
-  //   const parentNode = this.flatNodeMap.get(node);
-  //   let isParentHasChildren = false;
-  //   if (parentNode.children) {
-  //     isParentHasChildren = true;
-  //   }
-  //   this.databaseService.insertItem(parentNode, '');
-  //   if (isParentHasChildren) {
-  //     this.treeControl.expand(node);
-  //   }
-  // }
-
-  addNewItem(node: FlatNode) {
-    const parentNode = this.flatNodeMap.get(node);
-    let isParentHasChildren = false;
-    if (parentNode.children) {
-      isParentHasChildren = true;
-    }
-    this.databaseService.insertItem(parentNode, '');
-    if (isParentHasChildren) {
-      this.treeControl.expand(node);
-    }
-  }
-
-  // editItem(node: FlatNode, itemEditValue: string) {
-  //   const nestedNode = this.flatNodeMap.get(node);
-  //   this.databaseService.updateItem(nestedNode, itemEditValue);
-  // }
-
   deleteItem(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
     let isParentHasChildren = false;
@@ -166,11 +136,6 @@ export class TreesComponent implements OnInit {
 
   }
 
-  // Save node
-  // saveNode(node: FlatNode, itemValue: string) {
-  //   const nestedNode = this.flatNodeMap.get(node);
-  //   this.databaseService.updateItem(nestedNode, itemValue);
-  // }
 
   cancelNode(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
@@ -189,19 +154,6 @@ export class TreesComponent implements OnInit {
     });
   }
 
-  // Add new children
-  // addNewItem(node: FlatNode) {
-  //   const parentNode = this.flatNodeMap.get(node);
-  //   let isParentHasChildren = false;
-  //   if (parentNode.children) {
-  //     isParentHasChildren = true;
-  //   }
-  //   this.databaseService.insertItem(parentNode, '');
-  //   if (isParentHasChildren) {
-  //     this.treeControl.expand(node);
-  //   }
-  // }
-
   // opendialog
   onCreated(node: FlatNode): void {
     const dialogConfig = new MatDialogConfig();
@@ -217,16 +169,16 @@ export class TreesComponent implements OnInit {
     const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log(result);
         const foodNode: FoodNode = {
           treeId: result.treeId,
           name: result.name,
           parentId: result.parentId,
-          continent: {
-            continentId: result.contientId,
-            name: ''
-          },
+          continent: result.continent,
         };
         this.databaseService.updateItem(foodNode);
+        const parentNode = this.flatNodeMap.get(node);
+        this.databaseService.insertItem(parentNode, foodNode);
       }
     });
   }
@@ -249,10 +201,7 @@ export class TreesComponent implements OnInit {
           treeId: result.treeId,
           name: result.name,
           parentId: result.parentId,
-          continent: {
-            continentId: result.contientId,
-            name: ''
-          },
+          continent: result.continent
         };
         this.databaseService.updateItem(foodNode);
       }

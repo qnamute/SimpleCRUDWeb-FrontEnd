@@ -7,8 +7,8 @@
         </mat-form-field>
         <mat-form-field>
             <mat-label>Node Continent</mat-label>
-            <mat-select formControlName="continentId" [(value)]="selected">
-                <mat-option *ngFor="let continent of continents" [value]="continent.continentId">
+            <mat-select formControlName="continent" [(value)]="selected">
+                <mat-option *ngFor="let continent of continents" [value]="continent">
                     {{continent.name}}
                 </mat-option>
             </mat-select>
