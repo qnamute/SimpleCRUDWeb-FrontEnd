@@ -43,12 +43,11 @@ export class ListdatabaseService {
       node.name = value[i].name;
       node.parentId = value[i].parentId;
       node.treeId = value[i].treeId;
+      node.continent = value[i].continent;
       if (value[i].children.length > 0) {
         node.children = this.buildFileTree(value[i].children, level + 1);
       } else {
         node.name = value[i].name;
-        node.parentId = value[i].parentId;
-        node.treeId = value[i].treeId;
         node.children = [];
       }
       data.push(node);
@@ -117,8 +116,7 @@ export class ListdatabaseService {
     this.dataChange.next(this.data);
   }
 
-  updateItem(node: FoodNode, name: string) {
-    node.name = name;
+  updateItem(node: FoodNode) {
     if (node.treeId) {
       const tree: Tree = {
         treeId: node.treeId,

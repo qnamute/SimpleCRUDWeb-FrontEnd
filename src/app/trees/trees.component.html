@@ -4,13 +4,13 @@
         <mat-label>Edit item: {{selectedNode.name}}</mat-label>
         <input matInput #itemEditValue value="{{selectedNode.name}}">
     </mat-form-field>
-    <button mat-button (click)="editItem(selectedNode, itemEditValue.value)" color="primary">Save <mat-icon>save
+    <button mat-button color="primary">Save <mat-icon>save
         </mat-icon></button>
 </div>
 <div class="row-btn">
     <button mat-raised-button color="accent" (click)="addnewRootItem()">Add new root</button>
 </div>
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="trees">    
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="trees">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="onSelect(node)" class="tree"
         [class.selected]="node === selectedNode">
         <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
@@ -20,17 +20,28 @@
                 {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
         </button>
-        {{node.name}}
-        <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
-            (click)="addNewItem(node)" title="Add new children">
-            <mat-icon>add_circle_outline</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
-            (click)="deleteItem(node)">
-            <mat-icon>delete</mat-icon>
-        </button>
+        <mat-list>
+            <mat-list-item> {{node.continent.name}} </mat-list-item>
+            <mat-list-item>
+                <button mat-icon-button disabled></button>
+                {{node.name}}
+                <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
+                    (click)="onCreated(node)" title="Add new children">
+                    <mat-icon>add_circle_outline</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" aria-label="Example icon-button with a heart icon"
+                    (click)="onEdited(node)" title="Edit this node">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
+                    (click)="deleteItem(node)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-list-item>
+        </mat-list>
     </mat-tree-node>
-    <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
+
+    <!-- <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
         <button mat-icon-button disabled></button>
         <mat-form-field>
             <mat-label>New item...</mat-label>
@@ -38,7 +49,7 @@
         </mat-form-field>
         <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
         <button mat-button (click)="cancelNode(node)">Cancel</button>
-    </mat-tree-node>
+    </mat-tree-node> -->
 
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding (click)="onSelect(node)" class="tree"
         [class.selected]="node === selectedNode">
@@ -49,14 +60,24 @@
                 {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
         </button>
-        {{node.name}}
-        <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
-            (click)="addNewItem(node)" title="Add new children">
-            <mat-icon>add_circle_outline</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
-            (click)="deleteItem(node)">
-            <mat-icon>delete</mat-icon>
-        </button>
+        <mat-list>
+            <mat-list-item> {{node.continent.name}} </mat-list-item>
+            <mat-list-item>
+                <button mat-icon-button disabled></button>
+                {{node.name}}
+                <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
+                    (click)="onCreated(node)" title="Add new children">
+                    <mat-icon>add_circle_outline</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" aria-label="Example icon-button with a heart icon"
+                    (click)="onEdited(node)" title="Edit this node">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
+                    (click)="deleteItem(node)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-list-item>
+        </mat-list>
     </mat-tree-node>
 </mat-tree>

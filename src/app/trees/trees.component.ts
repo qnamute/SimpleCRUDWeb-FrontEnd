@@ -1,21 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, VirtualTimeScheduler, BehaviorSubject, from } from 'rxjs';
 import { TreesService } from '../services/trees.service';
 import { ListdatabaseService } from '../services/listdatabase.service';
 
 import { FlatNode } from '../interfaces/FlatNode';
 import { FoodNode } from '../interfaces/FoodNode';
-import { Tree } from '../models/tree';
+
+import { AddTreeDialogComponent } from '../add-tree-dialog/add-tree-dialog.component';
 
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig } from '@angular/material/dialog';
+import { Continent } from '../models/continent';
+import { ContinentService } from '../services/continent.service';
+import { BehaviorSubject } from 'rxjs';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { DialogData } from '../models/dialogdata';
 
 @Component({
   selector: 'app-trees',
   templateUrl: './trees.component.html',
   styleUrls: ['./trees.component.css']
 })
-export class TreesComponent {
+export class TreesComponent implements OnInit {
 
   dataChange: BehaviorSubject<FoodNode[]> = new BehaviorSubject<FoodNode[]>([]);
 
@@ -39,7 +45,13 @@ export class TreesComponent {
 
   dataSource: MatTreeFlatDataSource<FoodNode, FlatNode>;
 
-  constructor(private treesService: TreesService, private databaseService: ListdatabaseService) {
+  continents: Continent[];
+
+  nodeForm: FormGroup;
+
+  constructor(private treesService: TreesService, private databaseService: ListdatabaseService,
+    // tslint:disable-next-line: align
+    private matDialog: MatDialog, private continentService: ContinentService, private formBuilder: FormBuilder) {
 
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -61,6 +73,14 @@ export class TreesComponent {
     databaseService.dataChange.subscribe(data => {
       this.dataSource.data = data;
     });
+
+    this.continentService.getContinents().subscribe(result => {
+      this.continents = result;
+    });
+  }
+
+  ngOnInit(): void {
+    this.buildForm();
   }
 
   getLevel = (node: FlatNode) => node.level;
@@ -83,6 +103,7 @@ export class TreesComponent {
     flatNode.treeId = node.treeId;
     flatNode.parentId = node.parentId;
     flatNode.level = lv;
+    flatNode.continent = node.continent;
     if (node.children) {
       if (node.children.length > 0) {
         flatNode.expandable = true;
@@ -98,6 +119,18 @@ export class TreesComponent {
   }
 
   // Add new children
+  // addNewItem(node: FlatNode) {
+  //   const parentNode = this.flatNodeMap.get(node);
+  //   let isParentHasChildren = false;
+  //   if (parentNode.children) {
+  //     isParentHasChildren = true;
+  //   }
+  //   this.databaseService.insertItem(parentNode, '');
+  //   if (isParentHasChildren) {
+  //     this.treeControl.expand(node);
+  //   }
+  // }
+
   addNewItem(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
     let isParentHasChildren = false;
@@ -110,10 +143,10 @@ export class TreesComponent {
     }
   }
 
-  editItem(node: FlatNode, itemEditValue: string) {
-    const nestedNode = this.flatNodeMap.get(node);
-    this.databaseService.updateItem(nestedNode, itemEditValue);
-  }
+  // editItem(node: FlatNode, itemEditValue: string) {
+  //   const nestedNode = this.flatNodeMap.get(node);
+  //   this.databaseService.updateItem(nestedNode, itemEditValue);
+  // }
 
   deleteItem(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
@@ -130,14 +163,14 @@ export class TreesComponent {
   // Add new root item
 
   addnewRootItem() {
-    
+
   }
 
   // Save node
-  saveNode(node: FlatNode, itemValue: string) {
-    const nestedNode = this.flatNodeMap.get(node);
-    this.databaseService.updateItem(nestedNode, itemValue);
-  }
+  // saveNode(node: FlatNode, itemValue: string) {
+  //   const nestedNode = this.flatNodeMap.get(node);
+  //   this.databaseService.updateItem(nestedNode, itemValue);
+  // }
 
   cancelNode(node: FlatNode) {
     const parentNode = this.flatNodeMap.get(node);
@@ -146,5 +179,94 @@ export class TreesComponent {
 
   onSelect(node: FlatNode) {
     this.selectedNode = node;
+  }
+
+  buildForm(): void {
+    this.nodeForm = this.formBuilder.group({
+      treeId: [''],
+      name: ['', Validators.required],
+      contientId: ['', Validators.required],
+    });
+  }
+
+  // Add new children
+  // addNewItem(node: FlatNode) {
+  //   const parentNode = this.flatNodeMap.get(node);
+  //   let isParentHasChildren = false;
+  //   if (parentNode.children) {
+  //     isParentHasChildren = true;
+  //   }
+  //   this.databaseService.insertItem(parentNode, '');
+  //   if (isParentHasChildren) {
+  //     this.treeControl.expand(node);
+  //   }
+  // }
+
+  // opendialog
+  onCreated(node: FlatNode): void {
+    const dialogConfig = new MatDialogConfig();
+
+    this.expandNode(node);
+
+    dialogConfig.width = '25%';
+    dialogConfig.data = {
+      flatNode: node,
+      form: this.nodeForm,
+      action: 'Add'
+    };
+    const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const foodNode: FoodNode = {
+          treeId: result.treeId,
+          name: result.name,
+          parentId: result.parentId,
+          continent: {
+            continentId: result.contientId,
+            name: ''
+          },
+        };
+        this.databaseService.updateItem(foodNode);
+      }
+    });
+  }
+
+  onEdited(node: FlatNode): void {
+    const dialogConfig = new MatDialogConfig();
+
+    this.expandNode(node);
+
+    dialogConfig.width = '25%';
+    dialogConfig.data = {
+      flatNode: node,
+      form: this.nodeForm,
+      action: 'Edit'
+    };
+    const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const foodNode: FoodNode = {
+          treeId: result.treeId,
+          name: result.name,
+          parentId: result.parentId,
+          continent: {
+            continentId: result.contientId,
+            name: ''
+          },
+        };
+        this.databaseService.updateItem(foodNode);
+      }
+    });
+  }
+
+  expandNode(node: FlatNode): void {
+    const parentNode = this.flatNodeMap.get(node);
+    let isParentHasChildren = false;
+    if (parentNode.children) {
+      isParentHasChildren = true;
+    }
+    if (isParentHasChildren) {
+      this.treeControl.expand(node);
+    }
   }
 }

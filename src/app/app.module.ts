@@ -24,7 +24,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { TreesComponent } from './trees/trees.component';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatListModule, MatList } from '@angular/material/list';
 import { TreesService } from './services/trees.service';
+import { ContinentService } from './services/continent.service';
 import { ListdatabaseService } from './services/listdatabase.service';
 import { FormsModule } from '@angular/forms';
 import { AddTreeDialogComponent } from './add-tree-dialog/add-tree-dialog.component';
@@ -57,12 +59,14 @@ import { AddTreeDialogComponent } from './add-tree-dialog/add-tree-dialog.compon
     MatIconModule,
     MatCardModule,
     MatTreeModule,
-    FormsModule
+    FormsModule,
+    MatListModule
   ],
   providers: [
     BlogPostService,
     TreesService,
     ListdatabaseService,
+    ContinentService
   ],
   bootstrap: [AppComponent]
 })
