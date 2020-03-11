@@ -49,6 +49,7 @@ export class AddTreeDialogComponent implements OnInit {
         treeId: new FormControl(this.flatNode.treeId),
         name: new FormControl(this.flatNode.name, Validators.required),
         continent: new FormControl(this.flatNode.continent, Validators.required),
+        parentId: new FormControl(this.flatNode.parentId, Validators.required)
       });
     }
   }
@@ -61,6 +62,7 @@ export class AddTreeDialogComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
+    console.log(this.form.value);
     this.dialogRef.close(this.form.value);
   }
 }

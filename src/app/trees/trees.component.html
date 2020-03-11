@@ -14,14 +14,16 @@
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="onSelect(node)" class="tree"
         [class.selected]="node === selectedNode">
         <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
-        <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
-            [attr.aria-label]="'toggle ' + node.filename">
-            <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-        </button>
         <mat-list>
-            <mat-list-item> {{node.continent.name}} </mat-list-item>
+            <mat-list-item>
+                <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
+                    [attr.aria-label]="'toggle ' + node.filename">
+                    <mat-icon class="mat-icon-rtl-mirror">
+                        {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                </button>
+                {{node.continent.name}}
+            </mat-list-item>
             <mat-list-item>
                 <button mat-icon-button disabled></button>
                 {{node.name}}
@@ -41,28 +43,22 @@
         </mat-list>
     </mat-tree-node>
 
-    <!-- <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
-        <button mat-icon-button disabled></button>
-        <mat-form-field>
-            <mat-label>New item...</mat-label>
-            <input matInput #itemValue>
-        </mat-form-field>
-        <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
-        <button mat-button (click)="cancelNode(node)">Cancel</button>
-    </mat-tree-node> -->
 
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding (click)="onSelect(node)" class="tree"
         [class.selected]="node === selectedNode">
         <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
-        <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
-            [attr.aria-label]="'toggle ' + node.filename">
-            <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-        </button>
         <mat-list>
-            <mat-list-item> {{node.continent.name}} </mat-list-item>
             <mat-list-item>
+                <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
+                    [attr.aria-label]="'toggle ' + node.filename">
+                    <mat-icon class="mat-icon-rtl-mirror">
+                        {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                </button>
+                {{node.continent.name}}
+            </mat-list-item>
+            <mat-list-item>
+                <button mat-icon-button disabled></button>
                 <button mat-icon-button disabled></button>
                 {{node.name}}
                 <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"

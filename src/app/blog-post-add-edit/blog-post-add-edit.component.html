@@ -7,15 +7,6 @@
   <span class="text-danger ml-3" *ngIf="title.invalid && formDir.submitted">
     Title is required.
   </span>
-  <!-- <div class="form-group row">
-    <label class="control-label col-md-12" for="Body">Body text</label>
-    <div class="col-md-12">
-      <textarea class="form-control" rows="15" formControlName="body"></textarea>
-    </div>
-    <span class="text-danger ml-3" *ngIf="body.invalid && formDir.submitted">
-      Body is required.
-    </span>
-  </div> -->
   <mat-form-field class="example-full-width">
     <mat-label>Body</mat-label>
     <textarea matInput placeholder="Body" rows="15" formControlName="body" class="text-input"></textarea>

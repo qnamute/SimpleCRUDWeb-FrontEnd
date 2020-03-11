@@ -115,21 +115,21 @@ export class ListdatabaseService {
       // Edit node
       const tree: Tree = {
         treeId: node.treeId,
+        parentId: node.parentId,
         name: node.name,
         hasChild: false,
         continentId: node.continent.continentId,
       };
-      console.log(tree);
-      // this.treeService.updateTree(node.treeId, tree).subscribe(value => {
+      this.treeService.updateTree(node.treeId, tree).subscribe(value => {
 
-      // });
+      });
     } else {
       // Add new node
       const tree: Tree = {
         name: node.name,
         parentId: node.parentId,
         hasChild: false,
-        continentId: node.continent.continentId
+        continentId: node.continent.continentId,
       };
       this.treeService.saveTree(tree).subscribe(value => {
 

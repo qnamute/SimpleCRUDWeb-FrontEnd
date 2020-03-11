@@ -50,7 +50,7 @@ export class TreesService {
   }
 
   saveTree(tree): Observable<Tree> {
-    return this.http.post<Tree>('https://localhost:44369/api/trees', JSON.stringify(tree), this.httpOptions)
+    return this.http.post<Tree>(this.myAppUrl + this.myApiUrl, JSON.stringify(tree), this.httpOptions)
       .pipe(
         retry(1),
         catchError(this.errorHandler)
