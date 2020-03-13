@@ -4,6 +4,8 @@ import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { BlogPost } from '../models/blogpost';
+import { CoronaData } from '../interfaces/CoronaData';
+import { CoronaVirus } from '../interfaces/CoronaVirus';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +34,15 @@ export class BlogPostService {
 
   getBlogPost(postId: number): Observable<BlogPost> {
     return this.http.get<BlogPost>(this.myAppUrl + this.myApiUrl + postId)
+      .pipe(
+        retry(1),
+        catchError(this.errorHandler)
+      );
+  }
+
+  getCoronaData(): Observable<CoronaVirus> {
+    // tslint:disable-next-line: max-line-length
+    return this.http.get<CoronaVirus>('https://code.junookyo.xyz/api/ncov-moh/data.json?fbclid=IwAR130qIL3wSNrjjmFqBAdVJvMYFW9isRqEqlp-4Lf7bJVEqtkaHG4P_m__g')
       .pipe(
         retry(1),
         catchError(this.errorHandler)

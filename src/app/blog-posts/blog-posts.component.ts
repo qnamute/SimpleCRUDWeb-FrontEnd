@@ -6,6 +6,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { filter } from 'rxjs/operators';
+import { CoronaVirus } from '../interfaces/CoronaVirus';
 @Component({
   selector: 'app-blog-posts',
   templateUrl: './blog-posts.component.html',
@@ -16,6 +17,8 @@ export class BlogPostsComponent implements OnInit {
   displayedColumns: string[] = ['postId', 'title', 'body', 'creator', 'dt', 'edit-action', 'delete-action'];
   dataSource: MatTableDataSource<BlogPost>;
   blogPosts$: Observable<BlogPost[]>;
+
+  coronaVirus: CoronaVirus;
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
@@ -30,7 +33,10 @@ export class BlogPostsComponent implements OnInit {
       this.dataSource.sort = this.sort;
     });
 
-
+    this.blogPostService.getCoronaData().subscribe(value => {
+      this.coronaVirus = value;
+      console.log(value);
+    });
     // console.log(this.dataSource);
   }
 

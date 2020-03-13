@@ -3,8 +3,6 @@ import { BehaviorSubject } from 'rxjs';
 import { FoodNode } from '../interfaces/FoodNode';
 import { TreesService } from '../services/trees.service';
 import { Tree } from '../models/tree';
-import { removeSummaryDuplicates, unescapeIdentifier } from '@angular/compiler';
-import { FlatNode } from '../interfaces/FlatNode';
 @Injectable({
   providedIn: 'root'
 })
@@ -48,11 +46,16 @@ export class ListdatabaseService {
       node.isFieldType = false;
 
       const virtualNode = new FoodNode();
+      virtualNode.treeId = value[i].treeId;
       virtualNode.name = value[i].continent.name;
       virtualNode.continent = value[i].continent;
       virtualNode.children = [];
+
+      node.parent = virtualNode;
+
       virtualNode.children.push(node);
       virtualNode.isFieldType = true;
+
       if (value[i].children.length > 0) {
         node.children = this.buildFileTree(value[i].children, level + 1);
       } else {
@@ -84,9 +87,11 @@ export class ListdatabaseService {
   // }
 
   deleteItem(treeId: number, parent: FoodNode) {
+
     let tree: Tree;
     this.treeService.getTree(treeId).subscribe(value => {
       tree = value;
+      console.log(tree);
       if (tree.hasChild) {
         const ans = confirm('The ' + tree.name + ' have children node. Do you want to delete this node and all children node');
         if (ans) {
@@ -97,6 +102,7 @@ export class ListdatabaseService {
         this.treeService.deleteTree(treeId).subscribe(result => {
         });
       }
+      console.log(this.data);
       this.data.forEach(value => {
         this.removeNodeInData(value.children, treeId);
       });
@@ -106,9 +112,11 @@ export class ListdatabaseService {
   }
 
   removeNodeInData(nodes: FoodNode[], treeId: number) {
+    console.log(nodes);
     for (const index in nodes) {
       if (nodes[index].treeId === treeId) {
         nodes.splice(Number(index), 1);
+        this.dataChange.next(this.data);
         return;
       } else {
         if (nodes[index].children.length > 0) {
@@ -117,11 +125,11 @@ export class ListdatabaseService {
         }
       }
     }
-    this.dataChange.next(this.data);
   }
 
   insertItem(parent: FoodNode, child: FoodNode) {
     this.parentNode = parent;
+    child.isFieldType = true;
     if (parent.children) {
       // parent already has children
       parent.children.push(child);
@@ -133,14 +141,26 @@ export class ListdatabaseService {
     this.dataChange.next(this.data);
   }
 
-  editItem(node: FoodNode, newValue: FoodNode) {
+  // Edit real node
+  editItem(node: FoodNode, newValue: FoodNode, virtualNode: FoodNode) {
     console.log(newValue);
+    console.log(virtualNode);
+    const date = new Date();
+    console.log(date);
     node.name = newValue.name;
     node.continent.name = newValue.continent.name;
+    node.parent = newValue.parent;
     node.continent.continentId = newValue.continent.continentId;
     this.dataChange.next(this.data);
   }
 
+  // Update name of contient when edit continent
+  updateDisplayContinent(node: FoodNode, newValue: string) {
+    node.name = newValue;
+    this.dataChange.next(this.data);
+  }
+
+  // Check add or edit node and call funciton from service
   updateItem(node: FoodNode) {
     if (node.treeId) {
       // Edit node
