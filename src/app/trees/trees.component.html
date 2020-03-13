@@ -1,32 +1,23 @@
-<h3>Action</h3>
-<div class="example-button-row" *ngIf="selectedNode">
-    <mat-form-field>
-        <mat-label>Edit item: {{selectedNode.name}}</mat-label>
-        <input matInput #itemEditValue value="{{selectedNode.name}}">
-    </mat-form-field>
-    <button mat-button color="primary">Save <mat-icon>save
-        </mat-icon></button>
-</div>
-<div class="row-btn">
-    <button mat-raised-button color="accent" (click)="addnewRootItem()">Add new root</button>
-</div>
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="trees">
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="onSelect(node)" class="tree"
-        [class.selected]="node === selectedNode">
-        <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
-        <mat-list>
-            <mat-list-item>
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="onSelect(node)" class="tree">
+        <mat-accordion style="width: 100%;">
+            <mat-expansion-panel (opened)="node.isExpand = true" (closed)="node.isExpand = false" hideToggle="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-icon class="mat-icon-rtl-mirror" style="margin: 0 8px 0 8px;">
+                            {{node.isExpand ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                        {{node.continent.name}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <button mat-icon-button disabled></button>
                 <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
                     [attr.aria-label]="'toggle ' + node.filename">
                     <mat-icon class="mat-icon-rtl-mirror">
                         {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
                 </button>
-                {{node.continent.name}}
-            </mat-list-item>
-            <mat-list-item>
-                <button mat-icon-button disabled></button>
-                {{node.name}}
+                {{node.name}} - Level: {{node.levelDisplay}}
                 <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
                     (click)="onCreated(node)" title="Add new children">
                     <mat-icon>add_circle_outline</mat-icon>
@@ -39,28 +30,30 @@
                     (click)="deleteItem(node)">
                     <mat-icon>delete</mat-icon>
                 </button>
-            </mat-list-item>
-        </mat-list>
+            </mat-expansion-panel>
+        </mat-accordion>
     </mat-tree-node>
 
-
-    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding (click)="onSelect(node)" class="tree"
-        [class.selected]="node === selectedNode">
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding (click)="onSelect(node)" class="tree">
         <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
-        <mat-list>
-            <mat-list-item>
+        <mat-accordion style="width: 100%;">
+            <mat-expansion-panel (opened)="node.isExpand = true" (closed)="node.isExpand = false" hideToggle="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-icon class="mat-icon-rtl-mirror" style="margin: 0 8px 0 8px;">
+                            {{node.isExpand ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                        {{node.continent.name}}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <button mat-icon-button disabled></button>
                 <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
                     [attr.aria-label]="'toggle ' + node.filename">
                     <mat-icon class="mat-icon-rtl-mirror">
                         {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
                     </mat-icon>
                 </button>
-                {{node.continent.name}}
-            </mat-list-item>
-            <mat-list-item>
-                <button mat-icon-button disabled></button>
-                <button mat-icon-button disabled></button>
-                {{node.name}}
+                {{node.name}} - Level: {{node.levelDisplay}}
                 <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
                     (click)="onCreated(node)" title="Add new children">
                     <mat-icon>add_circle_outline</mat-icon>
@@ -73,7 +66,7 @@
                     (click)="deleteItem(node)">
                     <mat-icon>delete</mat-icon>
                 </button>
-            </mat-list-item>
-        </mat-list>
+            </mat-expansion-panel>
+        </mat-accordion>
     </mat-tree-node>
 </mat-tree>

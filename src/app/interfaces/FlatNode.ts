@@ -6,5 +6,7 @@ export class FlatNode {
     name: string;
     level: number;
     parentId: number;
+    isExpand?: boolean;
     continent: Continent;
+    levelDisplay: number;
 };

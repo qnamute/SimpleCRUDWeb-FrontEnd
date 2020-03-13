@@ -10,7 +10,9 @@ import { BlogPostComponent } from './blog-post/blog-post.component';
 import { BlogPostAddEditComponent } from './blog-post-add-edit/blog-post-add-edit.component';
 import { BlogPostService } from './services/blog-post.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -55,12 +57,14 @@ import { AddTreeDialogComponent } from './add-tree-dialog/add-tree-dialog.compon
     MatSelectModule,
     MatSlideToggleModule,
     MatPaginatorModule,
+    MatExpansionModule,
     MatTableModule,
     MatIconModule,
     MatCardModule,
     MatTreeModule,
     FormsModule,
-    MatListModule
+    MatListModule,
+    MatChipsModule,
   ],
   providers: [
     BlogPostService,

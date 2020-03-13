@@ -1,0 +1,6 @@
+.mat-expansion-indicator {
+    display: none;
+}
+.mat-expansion-panel-header-description {
+    flex-basis: 0;
+  }

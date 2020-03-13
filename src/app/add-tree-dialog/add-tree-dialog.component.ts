@@ -22,22 +22,24 @@ export class AddTreeDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<AddTreeDialogComponent>, private continentService: ContinentService,
     // tslint:disable-next-line: align
     @Inject(MAT_DIALOG_DATA) public dialogData: any) {
+    this.continents = dialogData.listContinent;
     this.flatNode = dialogData.flatNode;
     this.form = dialogData.form;
     this.action = dialogData.action;
-    this.selected = this.dialogData.flatNode.continent;
     this.buildForm();
   }
 
   ngOnInit(): void {
-    this.continentService.getContinents().subscribe(data => {
-      this.continents = data;
-    });
     // this.buildForm();
   }
 
   buildForm(): void {
     if (this.action === 'Add') {
+      const tempContient: Continent = {
+        name: '',
+        continentId: 0
+      };
+      this.selected = tempContient;
       this.form = new FormGroup({
         treeId: new FormControl(undefined),
         name: new FormControl('', Validators.required),
@@ -45,6 +47,7 @@ export class AddTreeDialogComponent implements OnInit {
         parentId: new FormControl(this.flatNode.treeId, Validators.required),
       });
     } else if (this.action === 'Edit') {
+      this.selected = this.flatNode.continent;
       this.form = new FormGroup({
         treeId: new FormControl(this.flatNode.treeId),
         name: new FormControl(this.flatNode.name, Validators.required),
@@ -62,7 +65,6 @@ export class AddTreeDialogComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-    console.log(this.form.value);
     this.dialogRef.close(this.form.value);
   }
 }

@@ -23,6 +23,8 @@ import { DialogData } from '../models/dialogdata';
 })
 export class TreesComponent implements OnInit {
 
+  panelOpenState = false;
+
   dataChange: BehaviorSubject<FoodNode[]> = new BehaviorSubject<FoodNode[]>([]);
 
   flatNodeMap: Map<FlatNode, FoodNode> = new Map<FlatNode, FoodNode>();
@@ -30,12 +32,6 @@ export class TreesComponent implements OnInit {
   nestedNodeMap: Map<FoodNode, FlatNode> = new Map<FoodNode, FlatNode>();
 
   selectedParent: FlatNode | null = null;
-
-  newItemName = '';
-
-  isEditing = true;
-
-  newItemId: number;
 
   selectedNode: FlatNode;
 
@@ -104,6 +100,7 @@ export class TreesComponent implements OnInit {
     flatNode.parentId = node.parentId;
     flatNode.level = lv;
     flatNode.continent = node.continent;
+    flatNode.levelDisplay = flatNode.level + 1;
     if (node.children) {
       if (node.children.length > 0) {
         flatNode.expandable = true;
@@ -115,6 +112,7 @@ export class TreesComponent implements OnInit {
     }
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
+    console.log(flatNode);
     return flatNode;
   }
 
@@ -134,12 +132,6 @@ export class TreesComponent implements OnInit {
 
   addnewRootItem() {
 
-  }
-
-
-  cancelNode(node: FlatNode) {
-    const parentNode = this.flatNodeMap.get(node);
-    this.databaseService.cancleInsertItem(parentNode);
   }
 
   onSelect(node: FlatNode) {
@@ -164,7 +156,8 @@ export class TreesComponent implements OnInit {
     dialogConfig.data = {
       flatNode: node,
       form: this.nodeForm,
-      action: 'Add'
+      action: 'Add',
+      listContinent: this.continents
     };
     const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
@@ -179,20 +172,19 @@ export class TreesComponent implements OnInit {
         this.databaseService.updateItem(foodNode);
         const parentNode = this.flatNodeMap.get(node);
         this.databaseService.insertItem(parentNode, foodNode);
+        this.expandNode(node);
       }
     });
   }
 
   onEdited(node: FlatNode): void {
     const dialogConfig = new MatDialogConfig();
-
-    this.expandNode(node);
-
     dialogConfig.width = '25%';
     dialogConfig.data = {
       flatNode: node,
       form: this.nodeForm,
-      action: 'Edit'
+      action: 'Edit',
+      listContinent: this.continents
     };
     const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
@@ -201,11 +193,14 @@ export class TreesComponent implements OnInit {
           treeId: result.treeId,
           name: result.name,
           parentId: result.parentId,
-          continent: result.continent
+          continent: result.continent,
         };
         this.databaseService.updateItem(foodNode);
+        const parentNode = this.flatNodeMap.get(node);
+        this.databaseService.editItem(parentNode, foodNode);
       }
     });
+    this.panelOpenState = true;
   }
 
   expandNode(node: FlatNode): void {

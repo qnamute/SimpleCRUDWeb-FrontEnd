@@ -31,6 +31,7 @@ export class ListdatabaseService {
 
     this.treeService.getTreesStructure().subscribe(value => {
       const data = this.buildFileTree(value, 0);
+      console.log(data);
       this.dataChange.next(data);
     });
   }
@@ -44,16 +45,43 @@ export class ListdatabaseService {
       node.parentId = value[i].parentId;
       node.treeId = value[i].treeId;
       node.continent = value[i].continent;
+      node.isFieldType = false;
+
+      const virtualNode = new FoodNode();
+      virtualNode.name = value[i].continent.name;
+      virtualNode.continent = value[i].continent;
+      virtualNode.children = [];
+      virtualNode.children.push(node);
+      virtualNode.isFieldType = true;
       if (value[i].children.length > 0) {
         node.children = this.buildFileTree(value[i].children, level + 1);
       } else {
-        node.name = value[i].name;
         node.children = [];
       }
-      data.push(node);
+      data.push(virtualNode);
     }
     return data;
   }
+
+  // buildFileTree(value: any, level: number): FoodNode[] {
+  //   const data: any[] = [];
+  //   // tslint:disable-next-line: prefer-for-of
+  //   for (let i = 0; i < value.length; i++) {
+  //     const node = new FoodNode();
+  //     node.name = value[i].name;
+  //     node.parentId = value[i].parentId;
+  //     node.treeId = value[i].treeId;
+  //     node.continent = value[i].continent;
+  //     if (value[i].children.length > 0) {
+  //       node.children = this.buildFileTree(value[i].children, level + 1);
+  //     } else {
+  //       node.name = value[i].name;
+  //       node.children = [];
+  //     }
+  //     data.push(node);
+  //   }
+  //   return data;
+  // }
 
   deleteItem(treeId: number, parent: FoodNode) {
     let tree: Tree;
@@ -105,8 +133,11 @@ export class ListdatabaseService {
     this.dataChange.next(this.data);
   }
 
-  cancleInsertItem(node: FoodNode) {
-    this.parentNode.children.pop();
+  editItem(node: FoodNode, newValue: FoodNode) {
+    console.log(newValue);
+    node.name = newValue.name;
+    node.continent.name = newValue.continent.name;
+    node.continent.continentId = newValue.continent.continentId;
     this.dataChange.next(this.data);
   }
 
@@ -121,7 +152,6 @@ export class ListdatabaseService {
         continentId: node.continent.continentId,
       };
       this.treeService.updateTree(node.treeId, tree).subscribe(value => {
-
       });
     } else {
       // Add new node
@@ -132,7 +162,8 @@ export class ListdatabaseService {
         continentId: node.continent.continentId,
       };
       this.treeService.saveTree(tree).subscribe(value => {
-
+        node.treeId = value.treeId;
+        this.dataChange.next(this.data);
       });
     }
   }

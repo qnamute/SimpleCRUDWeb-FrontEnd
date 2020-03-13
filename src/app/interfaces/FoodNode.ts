@@ -6,4 +6,5 @@ export class FoodNode {
     parentId: number;
     children?: FoodNode[];
     continent: Continent;
+    isFieldType?: boolean;
 };
