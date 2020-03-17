@@ -1,0 +1,22 @@
+click add -> pop up (name, type: 7 continent select or radio button)
+
+
+DIALOG
+
+Name: (textbox) durian
+Type: (dropdown list or radio button)
+Africa
+Antarctica
+Asia
+Europe
+North America
+Australia
+South America
+
+SAVE CANCEL
+
+----------
+level
+add=>push a virtual node with have child is realnode - done
+edit=> if change contient => update virutal node - loading
+delete=> delete node and virtual node
