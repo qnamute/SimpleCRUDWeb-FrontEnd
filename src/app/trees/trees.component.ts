@@ -99,7 +99,6 @@ export class TreesComponent implements OnInit {
     flatNode.level = lv;
     flatNode.continent = node.continent;
     flatNode.isFieldType = node.isFieldType;
-    flatNode.levelDisplay = flatNode.level + 1;
     if (node.children) {
       if (node.children.length > 0) {
         flatNode.expandable = true;
@@ -114,26 +113,18 @@ export class TreesComponent implements OnInit {
     return flatNode;
   }
 
-  deleteItem(node: FlatNode) {
-    const parentNode = this.flatNodeMap.get(node);
+  onDelete(node: FlatNode) {
+    const currentNode = this.flatNodeMap.get(node);
     let isParentHasChildren = false;
-    if (parentNode.children) {
+    if (currentNode.children) {
       isParentHasChildren = true;
     }
     const ans = confirm('Do you want to delete tree with id: ' + node.treeId + ', name: ' + node.name);
     if (ans) {
+      let parentNode = this.getParentNode(node);
+      parentNode.treeId = node.treeId;
       this.databaseService.deleteItem(node.treeId, parentNode);
     }
-  }
-
-  // Add new root item
-
-  addnewRootItem() {
-
-  }
-
-  onSelect(node: FlatNode) {
-    this.selectedNode = node;
   }
 
   buildForm(): void {
@@ -146,6 +137,7 @@ export class TreesComponent implements OnInit {
 
   // opendialog
   onCreated(node: FlatNode): void {
+    this.getParentNode(node);
     const dialogConfig = new MatDialogConfig();
 
     this.expandNode(node);
@@ -164,7 +156,7 @@ export class TreesComponent implements OnInit {
         const virtualNode: FoodNode = {
           treeId: result.treeId,
           name: result.continent.name,
-          continent: result.contientId,
+          continent: result.continent,
           parentId: result.parentId,
           children: [],
         };
@@ -175,7 +167,7 @@ export class TreesComponent implements OnInit {
           continent: result.continent,
         };
         virtualNode.children.push(foodNode);
-        this.databaseService.updateItem(foodNode);
+        this.databaseService.updateItem(foodNode, virtualNode);
         const parentNode = this.flatNodeMap.get(node);
         this.databaseService.insertItem(parentNode, virtualNode);
         this.expandNode(node);
@@ -201,17 +193,16 @@ export class TreesComponent implements OnInit {
           parentId: result.parentId,
           continent: result.continent,
         };
-        const virtualNode: FoodNode = {
-          treeId: result.treeId,
-          name: result.continent.name,
-          continent: result.contientId,
-          parentId: result.parentId,
-          children: [],
-        };
-        virtualNode.children.push(foodNode);
+        let continentNode = this.getParentNode(node);
+        continentNode.name = result.continent.name;
+        this.databaseService.editContinent(continentNode, result.continent.name);
+
         this.databaseService.updateItem(foodNode);
         const parentNode = this.flatNodeMap.get(node);
-        this.databaseService.editItem(parentNode, foodNode, virtualNode);
+        this.databaseService.editItem(parentNode, foodNode);
+        
+        // It's doesn't work
+        this.treeControl.expand(continentNode);
       }
     });
   }
@@ -225,5 +216,24 @@ export class TreesComponent implements OnInit {
     if (isParentHasChildren) {
       this.treeControl.expand(node);
     }
+  }
+
+
+  // Get parent of current node
+  getParentNode(node: FlatNode): FlatNode | null {
+    const currentLevel = this.getLevel(node);
+
+    if (currentLevel < 1) {
+      return null;
+    }
+    const startIndex = this.treeControl.dataNodes.indexOf(node) - 1;
+
+    for (let i = startIndex; i >= 0; i--) {
+      const currentNode = this.treeControl.dataNodes[i];
+      if (this.getLevel(currentNode) < currentLevel) {
+        return currentNode;
+      }
+    }
+    return null;
   }
 }
