@@ -107,13 +107,15 @@ export class ListdatabaseService {
   insertItem(parent: FoodNode, child: FoodNode) {
     this.parentNode = parent;
     child.isFieldType = true;
-    if (parent.children) {
+    if (parent.children.length >= 1) {
       // parent already has children
       parent.children.push(child);
-    } else {
+      console.log(parent.children.length);
+    } else {``
       // if parent is a leaf node
       parent.children = [];
       parent.children.push(child);
+      console.log(parent.children.length);
     }
     this.dataChange.next(this.data);
   }
@@ -155,7 +157,6 @@ export class ListdatabaseService {
       this.treeService.saveTree(tree).subscribe(value => {
         node.treeId = value.treeId;
         virtualNode.treeId = value.treeId;
-        console.log(this.data);
         this.dataChange.next(this.data);
       });
     }

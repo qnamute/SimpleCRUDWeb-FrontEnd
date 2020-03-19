@@ -1,14 +1,7 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="trees">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="tree">
-        <!-- <button mat-icon-button disabled></button> -->
-        <!-- <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
-            [attr.aria-label]="'toggle ' + node.filename">
-            <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-        </button> -->
         <button mat-icon-button disabled></button>
-        <div *ngIf="!node.isFieldType">{{node.name}} - Level: {{node.level}}</div>
+        <div *ngIf="!node.isFieldType">{{node.name}} - Level: {{node.levelDisplay}}</div>
         <div *ngIf="node.isFieldType">{{node.continent.name}}</div>
         <div *ngIf="!node.isFieldType">
             <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"
@@ -28,14 +21,14 @@
 
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding class="tree">
         <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
-        <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button>
+        <!-- <button mat-icon-button disabled *ngIf="!isExpandable(node)"></button> -->
         <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
             [attr.aria-label]="'toggle ' + node.filename">
             <mat-icon class="mat-icon-rtl-mirror">
                 {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
         </button>
-        <div *ngIf="!node.isFieldType">{{node.name}} - Level: {{node.level}}</div>
+        <div *ngIf="!node.isFieldType">{{node.name}} - Level: {{node.levelDisplay}}</div>
         <div *ngIf="node.isFieldType">{{node.continent.name}}</div>
         <div *ngIf="!node.isFieldType">
             <button mat-icon-button color="primary" aria-label="Example icon-button with a heart icon"

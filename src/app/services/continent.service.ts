@@ -33,6 +33,14 @@ export class ContinentService {
       );
   }
 
+  getContinent(continentId: number): Observable<Continent> {
+    return this.http.get<Continent>(this.myAppUrl + this.myApiUrl + continentId)
+      .pipe(
+        retry(1),
+        catchError(this.errorHandler)
+      );
+  }
+
   errorHandler(error) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {

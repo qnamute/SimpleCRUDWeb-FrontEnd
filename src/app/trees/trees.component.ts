@@ -99,6 +99,7 @@ export class TreesComponent implements OnInit {
     flatNode.level = lv;
     flatNode.continent = node.continent;
     flatNode.isFieldType = node.isFieldType;
+    flatNode.levelDisplay = (lv - 1) / 2 + 1;
     if (node.children) {
       if (node.children.length > 0) {
         flatNode.expandable = true;
@@ -137,7 +138,7 @@ export class TreesComponent implements OnInit {
 
   // opendialog
   onCreated(node: FlatNode): void {
-    this.getParentNode(node);
+    console.log(node);
     const dialogConfig = new MatDialogConfig();
 
     this.expandNode(node);
@@ -152,25 +153,29 @@ export class TreesComponent implements OnInit {
     const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(result);
-        const virtualNode: FoodNode = {
-          treeId: result.treeId,
-          name: result.continent.name,
-          continent: result.continent,
-          parentId: result.parentId,
-          children: [],
-        };
-        const foodNode: FoodNode = {
-          treeId: result.treeId,
-          name: result.name,
-          parentId: result.parentId,
-          continent: result.continent,
-        };
-        virtualNode.children.push(foodNode);
-        this.databaseService.updateItem(foodNode, virtualNode);
-        const parentNode = this.flatNodeMap.get(node);
-        this.databaseService.insertItem(parentNode, virtualNode);
-        this.expandNode(node);
+
+        this.continentService.getContinent(result.continentId).subscribe(value => {
+          console.log(value);
+
+          const virtualNode: FoodNode = {
+            treeId: result.treeId,
+            name: value.name,
+            continent: value,
+            parentId: result.parentId,
+            children: [],
+          };
+          const foodNode: FoodNode = {
+            treeId: result.treeId,
+            name: result.name,
+            parentId: result.parentId,
+            continent: value,
+          };
+
+          virtualNode.children.push(foodNode);
+          this.databaseService.updateItem(foodNode, virtualNode);
+          const parentNode = this.flatNodeMap.get(node);
+          this.databaseService.insertItem(parentNode, virtualNode);
+        });
       }
     });
   }
@@ -187,22 +192,26 @@ export class TreesComponent implements OnInit {
     const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const foodNode: FoodNode = {
-          treeId: result.treeId,
-          name: result.name,
-          parentId: result.parentId,
-          continent: result.continent,
-        };
-        let continentNode = this.getParentNode(node);
-        continentNode.name = result.continent.name;
-        this.databaseService.editContinent(continentNode, result.continent.name);
+        console.log(result);
+        this.continentService.getContinent(result.continentId).subscribe(value => {
+          const foodNode: FoodNode = {
+            treeId: result.treeId,
+            name: result.name,
+            parentId: result.parentId,
+            continent: value,
+          };
 
-        this.databaseService.updateItem(foodNode);
-        const parentNode = this.flatNodeMap.get(node);
-        this.databaseService.editItem(parentNode, foodNode);
-        
-        // It's doesn't work
-        this.treeControl.expand(continentNode);
+          this.databaseService.updateItem(foodNode);
+          const parentNode = this.flatNodeMap.get(node);
+          this.databaseService.editItem(parentNode, foodNode);
+
+          let continentNode = this.getParentNode(node);
+          continentNode.name = value.name;
+          this.databaseService.editContinent(continentNode, value.name);
+
+          // It's doesn't work
+          this.treeControl.expand(continentNode);
+        });
       }
     });
   }
@@ -217,7 +226,6 @@ export class TreesComponent implements OnInit {
       this.treeControl.expand(node);
     }
   }
-
 
   // Get parent of current node
   getParentNode(node: FlatNode): FlatNode | null {

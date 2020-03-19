@@ -17,7 +17,7 @@ export class AddTreeDialogComponent implements OnInit {
   form: FormGroup;
   flatNode: FlatNode;
   action: string;
-  selected: Continent;
+  selectedId: number;
 
   constructor(public dialogRef: MatDialogRef<AddTreeDialogComponent>, private continentService: ContinentService,
     // tslint:disable-next-line: align
@@ -34,24 +34,23 @@ export class AddTreeDialogComponent implements OnInit {
   }
 
   buildForm(): void {
+    if (this.dialogData.flatNode.continent.continentId) {
+      this.selectedId = this.dialogData.flatNode.continent.continentId;
+    } else {
+      this.selectedId = 0;
+    }
     if (this.action === 'Add') {
-      const tempContient: Continent = {
-        name: '',
-        continentId: 0
-      };
-      this.selected = tempContient;
       this.form = new FormGroup({
         treeId: new FormControl(undefined),
         name: new FormControl('', Validators.required),
-        continent: new FormControl('', Validators.required),
+        continentId: new FormControl('', Validators.required),
         parentId: new FormControl(this.flatNode.treeId, Validators.required),
       });
     } else if (this.action === 'Edit') {
-      this.selected = this.flatNode.continent;
       this.form = new FormGroup({
         treeId: new FormControl(this.flatNode.treeId),
         name: new FormControl(this.flatNode.name, Validators.required),
-        continent: new FormControl(this.flatNode.continent, Validators.required),
+        continentId: new FormControl(this.flatNode.continent.continentId, Validators.required),
         parentId: new FormControl(this.flatNode.parentId, Validators.required)
       });
     }
