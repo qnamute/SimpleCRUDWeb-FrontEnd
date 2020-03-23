@@ -1,6 +1,12 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="trees">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="tree">
-        <button mat-icon-button disabled></button>
+        <button *ngIf="!isExpandable(node)" mat-icon-button disabled></button>
+        <button *ngIf="isExpandable(node)" mat-icon-button matTreeNodeToggle
+            [attr.aria-label]="'toggle ' + node.filename">
+            <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+        </button>
         <div *ngIf="!node.isFieldType">{{node.name}} - Level: {{node.levelDisplay}}</div>
         <div *ngIf="node.isFieldType">{{node.continent.name}}</div>
         <div *ngIf="!node.isFieldType">

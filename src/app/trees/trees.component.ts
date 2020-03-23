@@ -85,8 +85,6 @@ export class TreesComponent implements OnInit {
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
 
-  hasNoContent = (_: number, nodeData: FlatNode) => nodeData.name === '';
-
   // Transformer to convert nested node to flat node. Record the nodes in maps for later use.
   transformer = (node: FoodNode, lv: number) => {
     const existingNode = this.nestedNodeMap.get(node);
@@ -100,17 +98,17 @@ export class TreesComponent implements OnInit {
     flatNode.continent = node.continent;
     flatNode.isFieldType = node.isFieldType;
     flatNode.levelDisplay = (lv - 1) / 2 + 1;
-    if (node.children) {
-      if (node.children.length > 0) {
-        flatNode.expandable = true;
-      } else {
-        flatNode.expandable = false;
-      }
+
+    if (node.children.length > 0) {
+      flatNode.expandable = true;
     } else {
       flatNode.expandable = false;
     }
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
+
+    console.log(flatNode);
+
     return flatNode;
   }
 
@@ -155,8 +153,6 @@ export class TreesComponent implements OnInit {
       if (result) {
 
         this.continentService.getContinent(result.continentId).subscribe(value => {
-          console.log(value);
-
           const virtualNode: FoodNode = {
             treeId: result.treeId,
             name: value.name,
@@ -169,6 +165,7 @@ export class TreesComponent implements OnInit {
             name: result.name,
             parentId: result.parentId,
             continent: value,
+            children: [],
           };
 
           virtualNode.children.push(foodNode);
@@ -181,6 +178,7 @@ export class TreesComponent implements OnInit {
   }
 
   onEdited(node: FlatNode): void {
+    var continentNode = this.getParentNode(node);
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '250px';
     dialogConfig.data = {
@@ -192,7 +190,6 @@ export class TreesComponent implements OnInit {
     const dialogRef = this.matDialog.open(AddTreeDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(result);
         this.continentService.getContinent(result.continentId).subscribe(value => {
           const foodNode: FoodNode = {
             treeId: result.treeId,
@@ -205,7 +202,7 @@ export class TreesComponent implements OnInit {
           const parentNode = this.flatNodeMap.get(node);
           this.databaseService.editItem(parentNode, foodNode);
 
-          let continentNode = this.getParentNode(node);
+          console.log(continentNode);
           continentNode.name = value.name;
           this.databaseService.editContinent(continentNode, value.name);
 

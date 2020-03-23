@@ -10,8 +10,6 @@ export class ListdatabaseService {
 
   dataChange: BehaviorSubject<FoodNode[]> = new BehaviorSubject<FoodNode[]>([]);
 
-  parentNode: FoodNode;
-
   get data(): FoodNode[] {
     return this.dataChange.value;
   }
@@ -61,14 +59,13 @@ export class ListdatabaseService {
       } else {
         node.children = [];
       }
+
       data.push(virtualNode);
     }
     return data;
   }
 
   deleteItem(treeId: number, parent: FoodNode, ) {
-
-    console.log(this.data);
     let tree: Tree;
     this.treeService.getTree(treeId).subscribe(value => {
       tree = value;
@@ -105,17 +102,17 @@ export class ListdatabaseService {
   }
 
   insertItem(parent: FoodNode, child: FoodNode) {
-    this.parentNode = parent;
+    // this.parentNode = parent;
     child.isFieldType = true;
-    if (parent.children.length >= 1) {
-      // parent already has children
-      parent.children.push(child);
-      console.log(parent.children.length);
-    } else {``
-      // if parent is a leaf node
-      parent.children = [];
-      parent.children.push(child);
-      console.log(parent.children.length);
+    if (parent.children) {
+      if (parent.children.length >= 1) {
+        // parent already has children
+        parent.children.push(child);
+      } else {
+        // if parent is a leaf node
+        parent.children = [];
+        parent.children.push(child);
+      }
     }
     this.dataChange.next(this.data);
   }
