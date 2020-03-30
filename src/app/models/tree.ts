@@ -8,4 +8,5 @@ export class Tree {
   parentId?: number;
   hasChild: boolean;
   continent?: Continent;
+  sortOrder?: number;
 }

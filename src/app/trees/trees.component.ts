@@ -15,6 +15,7 @@ import { ContinentService } from '../services/continent.service';
 import { BehaviorSubject } from 'rxjs';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DialogData } from '../models/dialogdata';
+// import { start } from 'repl';
 
 @Component({
   selector: 'app-trees',
@@ -81,6 +82,14 @@ export class TreesComponent implements OnInit {
 
   isExpandable = (node: FlatNode) => node.expandable;
 
+  // Check node is down or up able
+  isUpable = (node: FlatNode) => node.upable;
+
+  isDownable = (node: FlatNode) => node.downable;
+
+  // Check node is move able
+  isMoveable = (node: FlatNode) => node.moveable;
+
   getChildren = (node: FoodNode): FoodNode[] => node.children;
 
   hasChild = (_: number, node: FlatNode) => node.expandable;
@@ -98,17 +107,18 @@ export class TreesComponent implements OnInit {
     flatNode.continent = node.continent;
     flatNode.isFieldType = node.isFieldType;
     flatNode.levelDisplay = (lv - 1) / 2 + 1;
+    flatNode.moveable = node.moveable;
+    flatNode.upable = node.upable;
+    flatNode.downable = node.downable;
 
     if (node.children.length > 0) {
       flatNode.expandable = true;
     } else {
       flatNode.expandable = false;
     }
+
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
-
-    console.log(flatNode);
-
     return flatNode;
   }
 
@@ -122,7 +132,8 @@ export class TreesComponent implements OnInit {
     if (ans) {
       let parentNode = this.getParentNode(node);
       parentNode.treeId = node.treeId;
-      this.databaseService.deleteItem(node.treeId, parentNode);
+      let grandNode = this.getParentNode(parentNode);
+      this.databaseService.deleteItem(node.treeId);
     }
   }
 
@@ -136,7 +147,6 @@ export class TreesComponent implements OnInit {
 
   // opendialog
   onCreated(node: FlatNode): void {
-    console.log(node);
     const dialogConfig = new MatDialogConfig();
 
     this.expandNode(node);
@@ -168,9 +178,35 @@ export class TreesComponent implements OnInit {
             children: [],
           };
 
+          const parentNode = this.flatNodeMap.get(node);
+
+          // Because of default new node will be inserted at the end of list child 
+
+          if (parentNode.children.length == 1) {
+            foodNode.downable = false;
+            foodNode.moveable = true;
+            foodNode.upable = true;
+            parentNode.children[parentNode.children.length - 1].children[0].downable = true;
+            parentNode.children[parentNode.children.length - 1].children[0].moveable = true;
+            parentNode.children[parentNode.children.length - 1].children[0].upable = false;
+          } else if (parentNode.children.length > 1) {
+            // this parent already has childs
+            foodNode.downable = false;
+            foodNode.moveable = true;
+            foodNode.upable = true;
+            parentNode.children[parentNode.children.length - 1].children[0].downable = true;
+            console.log(parentNode.children[parentNode.children.length - 1]);
+          }
+          else {
+            // this parent has no child
+            foodNode.upable = false;
+            foodNode.moveable = false;
+            foodNode.downable = false;
+          }
+
           virtualNode.children.push(foodNode);
           this.databaseService.updateItem(foodNode, virtualNode);
-          const parentNode = this.flatNodeMap.get(node);
+
           this.databaseService.insertItem(parentNode, virtualNode);
         });
       }
@@ -202,7 +238,6 @@ export class TreesComponent implements OnInit {
           const parentNode = this.flatNodeMap.get(node);
           this.databaseService.editItem(parentNode, foodNode);
 
-          console.log(continentNode);
           continentNode.name = value.name;
           this.databaseService.editContinent(continentNode, value.name);
 
@@ -211,6 +246,29 @@ export class TreesComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Move up event
+  onMoveUp(currentNode: FlatNode): void {
+    // const currentFoodNode = this.flatNodeMap.get(currentNode);
+    // const aboveFoodNode = this.flatNodeMap.get(this.getAboveNode(currentNode));
+
+    let parentCurrentFoodNode = this.flatNodeMap.get(this.getParentNode(currentNode));
+    let parentAboveFoodNode = this.flatNodeMap.get(this.getParentNode(this.getAboveNode(currentNode)));
+
+    this.databaseService.swapNodePosition(parentCurrentFoodNode, parentAboveFoodNode);
+  }
+
+  // Move down event
+  onMoveDown(currentNode: FlatNode): void {
+    // const currentFoodNode = this.flatNodeMap.get(currentNode);
+    // const underFoodNode = this.flatNodeMap.get(this.getUnderNode(currentNode));
+
+    let parentCurrentFoodNode = this.flatNodeMap.get(this.getParentNode(currentNode));
+    let parentUnderFoodNode = this.flatNodeMap.get(this.getParentNode(this.getUnderNode(currentNode)));
+
+
+    this.databaseService.swapNodePosition(parentCurrentFoodNode, parentUnderFoodNode);
   }
 
   expandNode(node: FlatNode): void {
@@ -236,6 +294,42 @@ export class TreesComponent implements OnInit {
     for (let i = startIndex; i >= 0; i--) {
       const currentNode = this.treeControl.dataNodes[i];
       if (this.getLevel(currentNode) < currentLevel) {
+        return currentNode;
+      }
+    }
+    return null;
+  }
+
+  // Get under node of selected noded
+  getUnderNode(node: FlatNode): FlatNode | null {
+
+    // Get the frist node satisfy the condition
+    // 1. Has a same parentId
+    // 2. Has a same level
+
+    const startIndex = this.treeControl.dataNodes.indexOf(node);
+    const selectedNode = this.treeControl.dataNodes[startIndex];
+    for (let i = startIndex + 1; i <= this.treeControl.dataNodes.length; i++) {
+      const currentNode = this.treeControl.dataNodes[i];
+      if (selectedNode.parentId === currentNode.parentId && selectedNode.level === currentNode.level) {
+        return currentNode;
+      }
+    }
+    return null;
+  }
+
+  // Get above node of selectednode
+  getAboveNode(node: FlatNode): FlatNode | null {
+
+    // Get the frist node satisfy the condition
+    // 1. Has a same parentId
+    // 2. Has a same level
+
+    const startIndex = this.treeControl.dataNodes.indexOf(node);
+    const selectedNode = this.treeControl.dataNodes[startIndex];
+    for (let i = startIndex - 1; i >= 0; i--) {
+      const currentNode = this.treeControl.dataNodes[i];
+      if (selectedNode.parentId === currentNode.parentId && selectedNode.level === currentNode.level) {
         return currentNode;
       }
     }

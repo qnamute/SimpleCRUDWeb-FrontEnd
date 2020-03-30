@@ -65,6 +65,16 @@ export class TreesService {
       );
   }
 
+  swapTreeSortOrder(selectedId: number, targetId: number): Observable<Tree> {
+    const actionName = 'SwapTreeSortOrder';
+    let params: number[] = [selectedId, targetId];
+    return this.http.post<Tree>(this.myAppUrl + this.myApiUrl + actionName, params, this.httpOptions)
+      .pipe(
+        retry(1),
+        catchError(this.errorHandler)
+      );
+  }
+
   updateItem(node: FoodNode, name: string) {
     return this.http.put<Tree>(this.myAppUrl + this.myApiUrl + node.treeId, JSON.stringify(node), this.httpOptions)
       .pipe(

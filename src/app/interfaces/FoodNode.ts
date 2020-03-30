@@ -8,4 +8,9 @@ export class FoodNode {
     children?: FoodNode[];
     continent: Continent;
     isFieldType?: boolean;
+    sortOrder?: number;
+
+    moveable?: boolean;
+    downable?: boolean;
+    upable?: boolean;
 };

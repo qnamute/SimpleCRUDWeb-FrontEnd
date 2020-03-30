@@ -22,6 +22,15 @@
                 (click)="onDelete(node)">
                 <mat-icon>delete</mat-icon>
             </button>
+
+            <button mat-icon-button disabled></button>
+
+            <button mat-icon-button aria-label="Move node up" title="Move node up" (click)="onMoveUp(node)" *ngIf="isMoveable(node)&&isUpable(node)">
+                <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Move node down" title="Move node down" (click)="onMoveDown(node)" *ngIf="isMoveable(node)&&isDownable(node)">
+                <mat-icon>arrow_downward</mat-icon>
+            </button>
         </div>
     </mat-tree-node>
 
@@ -48,6 +57,15 @@
             <button mat-icon-button color="warn" aria-label="Delete this node" title="Delete this node"
                 (click)="onDelete(node)">
                 <mat-icon>delete</mat-icon>
+            </button>
+
+            <button mat-icon-button disabled></button>
+
+            <button mat-icon-button aria-label="Move node up" title="Move node up" (click)="onMoveUp(node)" *ngIf="isMoveable(node)&&isUpable(node)">
+                <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <button mat-icon-button aria-label="Move node down" title="Move node down" (click)="onMoveDown(node)" *ngIf="isMoveable(node)&&isDownable(node)">
+                <mat-icon>arrow_downward</mat-icon>
             </button>
         </div>
     </mat-tree-node>

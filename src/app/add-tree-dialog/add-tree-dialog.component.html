@@ -17,6 +17,6 @@
     </div>
     <div mat-dialog-actions>
         <button mat-button (click)="onCancelClick()">Cancel</button>
-        <button mat-button type="submit" (click)='onSaveClick()'>Save</button>
+        <button mat-button type="submit" (click)='onSaveClick()' (keyup.enter)='onSaveClick()'>Save</button>
     </div>
 </form>

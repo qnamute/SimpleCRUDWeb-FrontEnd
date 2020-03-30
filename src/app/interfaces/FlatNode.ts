@@ -10,4 +10,10 @@ export class FlatNode {
     isFieldType?: boolean;
     continent: Continent;
     levelDisplay: number;
+    sortOrder?: number;
+    
+    upable?: boolean;
+    downable?: boolean;
+    moveable?: boolean;
 };
+
